@@ -64,3 +64,7 @@ app.on('activate', function () {
 ipc.on('addNewTask', function(event, arg) {
   mainWindow.webContents.send('addNewTask', arg);
 });
+
+ipc.on('', function(event, arg) {
+  todoWindow.webContents.send('sendTodoIndex', indexToOpen):
+});

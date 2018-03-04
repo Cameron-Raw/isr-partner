@@ -9,6 +9,7 @@ var taskInput = document.getElementById('task-input');
 var noTaskWarning = document.getElementById('noTaskWarning');
 var newTaskButton = document.getElementById('task-button');
 var todoListUl = document.getElementById('todo-ul');
+var todoArray = [];
 
 console.log("savedTodoList is " + savedTodoList);
 
@@ -19,11 +20,25 @@ function refreshTodoList() {
   for( var i = 0; i < savedTodoList.length; i++ ){
     var li = document.createElement("li");
     li.appendChild(document.createTextNode(savedTodoList[i].taskTitle));
-    console.log();
     todoListUl.appendChild(li);
-  }
+    todoArray.push(li.innerHTML);
+    li.addEventListener("click", function(event) {
+      // Should open full entry with option to delete
+      var indexToOpen = todoArray.indexOf(this.innerHTML);
 
-  console.log(todoListUl.getElementsByTagName("li").length);
+      // TODO: Open new window
+      const modalPath = path.join('file://', __dirname, '../todoitem.html');
+      let todoWindow = new BrowserWindow({ width: 400, height: 200 });
+      todoWindow.on('close', function(){ win = null });
+      todoWindow.loadURL(modalPath);
+      console.log(modalPath);
+      todoWindow.show();
+
+      // TODO: Pass index of selection to ipc
+      ipc.send('sendTodoIndex', indexToOpen);
+
+    });
+  }
 
   if(todoListUl.getElementsByTagName("li").length > 0){
     noTaskWarning.style.display = "none";
@@ -32,8 +47,16 @@ function refreshTodoList() {
   }
 }
 
-refreshTodoList();
+ function openTodoItem(){
+   const modalPath = path.join('file://', __dirname, '../newtask.html');
+   let win = new BrowserWindow({ width: 400, height: 200 });
+   win.on('close', function(){ win = null });
+   win.loadURL(modalPath);
+   console.log(modalPath);
+   win.show();
+ }
 
+refreshTodoList();
 
 newTaskButton.addEventListener("click",function(event){
   const modalPath = path.join('file://', __dirname, '../newtask.html');
@@ -45,11 +68,8 @@ newTaskButton.addEventListener("click",function(event){
 });
 
 ipc.on('addNewTask', function(event, arg){
-
   var newTodoList = savedTodoList;
-  console.log("arg is " + arg);
   newTodoList.push(arg);
-  console.log("newtodolist after push is " + newTodoList);
   var newTodoListStr = JSON.stringify(newTodoList);
 
   fs.writeFile('src/js/json/todo.json', newTodoListStr, function(err) {
@@ -57,7 +77,5 @@ ipc.on('addNewTask', function(event, arg){
       console.log("An error ocurred updating JSON file " + err.message);
     }
   });
-
   refreshTodoList();
-
 });

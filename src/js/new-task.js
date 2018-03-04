@@ -19,8 +19,8 @@ addTask.addEventListener("click", function(event) {
   console.log("DEBUG: newTask body is " + newTask.taskBody);
   ipc.send('addNewTask', newTask);
 
-  // var window = remote.getCurrentWindow();
-  // window.close();
+  var window = remote.getCurrentWindow();
+  window.close();
 
 });
 
