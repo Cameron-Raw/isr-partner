@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>ISR Partner</title>
+  </head>
+  <body>
+    <h1>ISR Partner</h1>
+    <!-- All of the Node.js APIs are available in this renderer process. -->
+    We are using Node.js <script>document.write(process.versions.node)</script>,
+    Chromium <script>document.write(process.versions.chrome)</script>,
+    and Electron <script>document.write(process.versions.electron)</script>.
+
+    <div id="todo-list">
+      <div class="container">
+        <h3 id="noTaskWarning">No tasks to show!</h3>
+
+        <ul id="todo-ul">
+        </ul>
+
+        <form>
+          <input id="task-input" name="new-task" type="text" placeholder="Add new task here...">
+          <button id="task-button" type="button">Add task</button>
+        </form>
+
+      </div>
+    </div>
+
+    <script>
+      // You can also require other files to run in this process
+      require('./js/todo-list.js')
+      // require('./../renderer.js')
+    </script>
+  </body>
+</html>
