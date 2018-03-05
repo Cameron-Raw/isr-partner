@@ -4,7 +4,6 @@ const BrowserWindow = electron.remote.BrowserWindow;
 const ipc = electron.ipcRenderer;
 const fs = require('fs');
 var savedTodoList = require('./json/todo.json');
-
 var taskInput = document.getElementById('task-input');
 var noTaskWarning = document.getElementById('noTaskWarning');
 var newTaskButton = document.getElementById('task-button');
@@ -23,19 +22,14 @@ function refreshTodoList() {
     todoListUl.appendChild(li);
     todoArray.push(li.innerHTML);
     li.addEventListener("click", function(event) {
-      // Should open full entry with option to delete
+      // TODO: use IPC to open window within main.js
+
+      // Saves list entry's index for use later
       var indexToOpen = todoArray.indexOf(this.innerHTML);
 
-      // TODO: Open new window
-      const modalPath = path.join('file://', __dirname, '../todoitem.html');
-      let todoWindow = new BrowserWindow({ width: 400, height: 200 });
-      todoWindow.on('close', function(){ win = null });
-      todoWindow.loadURL(modalPath);
-      console.log(modalPath);
-      todoWindow.show();
+      // Sends IPC to open todo item
+      ipc.send('openItem', indexToOpen, savedTodoList);
 
-      // TODO: Pass index of selection to ipc
-      ipc.send('sendTodoIndex', indexToOpen);
 
     });
   }
@@ -46,15 +40,6 @@ function refreshTodoList() {
     noTaskWarning.style.display = "block";
   }
 }
-
- function openTodoItem(){
-   const modalPath = path.join('file://', __dirname, '../newtask.html');
-   let win = new BrowserWindow({ width: 400, height: 200 });
-   win.on('close', function(){ win = null });
-   win.loadURL(modalPath);
-   console.log(modalPath);
-   win.show();
- }
 
 refreshTodoList();
 
@@ -67,7 +52,8 @@ newTaskButton.addEventListener("click",function(event){
   win.show();
 });
 
-ipc.on('addNewTask', function(event, arg){
+// Receiver for when new task is added to list
+ipc.on('addNewTask', function(event, arg) {
   var newTodoList = savedTodoList;
   newTodoList.push(arg);
   var newTodoListStr = JSON.stringify(newTodoList);

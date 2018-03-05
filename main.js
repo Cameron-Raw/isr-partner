@@ -6,8 +6,8 @@ const BrowserWindow = electron.BrowserWindow;
 
 const path = require('path');
 const url = require('url');
-
 const ipc = require('electron').ipcMain;
+
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -61,10 +61,44 @@ app.on('activate', function () {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 
-ipc.on('addNewTask', function(event, arg) {
-  mainWindow.webContents.send('addNewTask', arg);
+// Here we specify the current focused li item in the todo list
+// which is selected by clicking on the li itself
+
+var liIndex;
+var currentList;
+let todoWindow;
+
+ipc.on('openItem', function(event, arg, data) {
+
+  // Receive index of li
+  liIndex = arg;
+
+  // Receive current todo.JSON
+  currentList = data;
+
+  // Open new window
+  var modalPath = path.join('file://', __dirname, 'src/todoitem.html');
+  todoWindow = new BrowserWindow({ width: 600, height: 400 });
+  todoWindow.on('close', function(){ win = null });
+  todoWindow.loadURL(modalPath);
+  console.log(modalPath);
+  todoWindow.show();
+
+  // TODO: Send index to new window
+
+  // todoWindow.webContents.send('openItem', liIndex);
 });
 
-ipc.on('', function(event, arg) {
-  todoWindow.webContents.send('sendTodoIndex', indexToOpen):
+// Send index to todoWindow upon receiving requestLiIndex,
+// confirming the window is rendered
+
+ipc.on('requestLiIndex', function(event, arg) {
+  if (arg === true) {
+    todoWindow.webContents.send('responseLiIndex', liIndex, currentList);
+  }
+});
+
+// Receives addNewTask from new-task.js
+ipc.on('addNewTask', function(event, arg) {
+  mainWindow.webContents.send('addNewTask', arg);
 });

@@ -4,6 +4,8 @@ const BrowserWindow = electron.remote.BrowserWindow;
 const remote = electron.remote;
 const ipc = electron.ipcRenderer;
 
+
+
 var newTaskTitle = document.getElementById('newTaskTitle');
 var newTaskNotes = document.getElementById('newTaskNotes');
 
@@ -17,6 +19,8 @@ addTask.addEventListener("click", function(event) {
   };
   console.log("DEBUG: newTask title is " + newTask.taskTitle);
   console.log("DEBUG: newTask body is " + newTask.taskBody);
+
+  // Sends new task to main.js
   ipc.send('addNewTask', newTask);
 
   var window = remote.getCurrentWindow();
