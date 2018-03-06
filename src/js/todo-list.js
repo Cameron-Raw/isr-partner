@@ -12,11 +12,13 @@ var todoListUl = document.getElementById('todo-ul');
 var todoArray = [];
 
 console.log(savedTodoList);
+console.log("basePath is " + basePath);
 
 function reloadTodoJSON() {
   fs.readFile('/json/todo.json', "utf-8", function(data) {
-    console.log("Reload has been called and this is parsed JSON " + JSON.parse(data));
-    savedTodoList = JSON.parse(data);
+    console.log("Reload has been called and this is parsed JSON " + data);
+    // savedTodoList = JSON.parse(data);
+	savedTodoList = data;
   });
 }
 
@@ -50,7 +52,7 @@ function refreshTodoList() {
 refreshTodoList();
 
 newTaskButton.addEventListener("click",function(event){
-  const modalPath = path.join('file://', __dirname, '../newtask.html');
+  const modalPath = path.join(__dirname, '../newtask.html');
   let win = new BrowserWindow({ width: 400, height: 200 });
   win.on('close', function(){ win = null });
   win.loadURL(modalPath);
@@ -66,14 +68,15 @@ ipc.on('addNewTask', function(event, arg) {
   var newTodoListStr = JSON.stringify(newTodoList);
   console.log("newTodoListStr is " + newTodoListStr);
 
-  fs.writeFile('/json/todo.json', newTodoListStr, function(err) {
+  fs.writeFile(basePath + '/json/todo.json', newTodoListStr, function(err) {
     if (err) {
       console.log("An error ocurred updating JSON file " + err.message);
     }
     console.log("Successfully wrote " + newTodoListStr + "to the JSON file.");
   });
   fs.readFile('/json/todo.json', "utf-8", function(data) {
-    savedTodoList = JSON.parse(data);
+    // savedTodoList = JSON.parse(data);
+	savedTodoList = data;
   });
 
   reloadTodoJSON();
